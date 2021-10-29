@@ -24,7 +24,7 @@ def IFM(linear_feature_columns, dnn_feature_columns, dnn_hidden_units=(256, 128,
 
     :param linear_feature_columns: An iterable containing all the features used by linear part of the model.
     :param dnn_feature_columns: An iterable containing all the features used by deep part of the model.
-    :param dnn_hidden_units: list,list of positive integer or empty list, the layer number and units in each layer of DNN
+    :param dnn_hidden_units: list,list of positive integer or empty list, the layer number and units in each layer of DNN 层数和单元
     :param l2_reg_linear: float. L2 regularizer strength applied to linear part
     :param l2_reg_embedding: float. L2 regularizer strength applied to embedding vector
     :param l2_reg_dnn: float. L2 regularizer strength applied to DNN
@@ -40,10 +40,16 @@ def IFM(linear_feature_columns, dnn_feature_columns, dnn_hidden_units=(256, 128,
         raise ValueError("dnn_hidden_units is null!")
 
     features = build_input_features(
-        linear_feature_columns + dnn_feature_columns)
+        linear_feature_columns + dnn_feature_columns)#为所有的特征列构造keras tensor，结果以OrderDict形式返回
 
     sparse_feat_num = len(list(filter(lambda x: isinstance(x, SparseFeat) or isinstance(x, VarLenSparseFeat),
                                       dnn_feature_columns)))
+    #filter(function, iterable)返回可迭代对象，用list()构建列表。其中iterable序列的每个元素作为参数传递给function()进行判断，
+    # 然后返回 True 或 False，最后将返回 True 的元素放到新interable中。
+    # 此处lambda()作为function()。
+    # isinstance(object, classinfo) object：实例对象。classinfo：可以是直接或间接类名、基本类型或者由它们组成的元组。
+        # 返回值：如果对象的类型与参数二的类型（classinfo）相同则返回 True，否则返回 False。
+    #此处dnn_feature_columns的‘元素’依次传给lambda()，在lambda()里赋值给x，isinstance()判断是否是相应类型。
     inputs_list = list(features.values())
 
     sparse_embedding_list, _ = input_from_feature_columns(features, dnn_feature_columns,
@@ -54,7 +60,7 @@ def IFM(linear_feature_columns, dnn_feature_columns, dnn_hidden_units=(256, 128,
     dnn_input = combined_dnn_input(sparse_embedding_list, [])
     dnn_output = DNN(dnn_hidden_units, dnn_activation, l2_reg_dnn, dnn_dropout, dnn_use_bn, seed=seed)(dnn_input)
     # here, dnn_output is the m'_{x}
-    dnn_output = tf.keras.layers.Dense(
+    dnn_output = tf.keras.layers.Dense(#获得DNN的logit（在wdl.py中）
         sparse_feat_num, use_bias=False, kernel_initializer=tf.keras.initializers.glorot_normal(seed=seed))(dnn_output)
     # input_aware_factor m_{x,i}
     input_aware_factor = Lambda(lambda x: tf.cast(tf.shape(x)[-1], tf.float32) * softmax(x, dim=1))(dnn_output)

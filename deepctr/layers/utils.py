@@ -7,10 +7,17 @@ Author:
 """
 import tensorflow as tf
 from tensorflow.python.keras.layers import Flatten
+#keras.layers.Flatten(data_format=None) 将输入展平。不影响批量大小。
+#data_format：一个字符串，其值为 channels_last（默认值）或者 channels_first。它表明输入的维度的顺序。
+# 此参数的目的是当模型从一种数据格式切换到另一种数据格式时保留权重顺序。channels_last 对应着尺寸为 (batch, ..., channels) 的输入，
+# 而 channels_first 对应着尺寸为 (batch, channels, ...) 的输入。默认为 image_data_format 的值，
+# 可以在 Keras 的配置文件 ~/.keras/keras.json 中找到它。如果从未设置过它，那么它默认是 channels_last
 from tensorflow.python.ops.lookup_ops import TextFileInitializer
+#来自文本文件的表初始值设定项。
 
 try:
     from tensorflow.python.ops.lookup_ops import StaticHashTable
+#初始化后不可变的通用哈希表。
 except ImportError:
     from tensorflow.python.ops.lookup_ops import HashTable as StaticHashTable
 
@@ -280,9 +287,9 @@ def add_func(inputs):
 
 def combined_dnn_input(sparse_embedding_list, dense_value_list):
     if len(sparse_embedding_list) > 0 and len(dense_value_list) > 0:
-        sparse_dnn_input = Flatten()(concat_func(sparse_embedding_list))
-        dense_dnn_input = Flatten()(concat_func(dense_value_list))
-        return concat_func([sparse_dnn_input, dense_dnn_input])
+        sparse_dnn_input = Flatten()(concat_func(sparse_embedding_list))#将SparseFeat和VarLenSparseFeat的嵌入向量进行拼接
+        dense_dnn_input = Flatten()(concat_func(dense_value_list))#拼接所有的DenseFeat
+        return concat_func([sparse_dnn_input, dense_dnn_input])#将SparseFeat、VarLenSparseFeat和DenseFeat拼接
     elif len(sparse_embedding_list) > 0:
         return Flatten()(concat_func(sparse_embedding_list))
     elif len(dense_value_list) > 0:

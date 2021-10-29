@@ -9,17 +9,59 @@ Author:
 import numpy as np
 import tensorflow as tf
 from tensorflow.python.keras import backend as K
+#Keras 是一个模型级库，提供高层次的构建模块。它不处理诸如 张量乘积 和 卷积 等低级操作。
+# keras依赖于一个专门的、优化的张量操作库来完成这个操作，它可以作为 Keras 的「后端引擎」。
+#Keras 有三个后端实现可用: TensorFlow 后端，Theano 后端，CNTK 后端。
 from tensorflow.python.keras.initializers import TruncatedNormal
+#keras.initializers.TruncatedNormal(mean=0.0, stddev=0.05, seed=None) 按照截尾正态分布生成随机张量的初始化器。
+#生成的随机值与 RandomNormal 生成的类似，但是在距离平均值两个标准差之外的随机值将被丢弃并重新生成。这是用来生成神经网络权重和滤波器的推荐初始化器。
+# mean: 一个 Python 标量或者一个标量张量。要生成的随机值的平均数。
+# stddev: 一个 Python 标量或者一个标量张量。要生成的随机值的标准差。
+# seed: 一个 Python 整数。用于设置随机数种子。
 from tensorflow.python.keras.layers import LSTM, Lambda, Layer
+#keras.layers.LSTM(units, activation='tanh', recurrent_activation='hard_sigmoid', use_bias=True, kernel_initializer='glorot_uniform',
+#  recurrent_initializer='orthogonal', bias_initializer='zeros', unit_forget_bias=True, kernel_regularizer=None, 
+# recurrent_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, recurrent_constraint=None, 
+# bias_constraint=None, dropout=0.0, recurrent_dropout=0.0, implementation=1, return_sequences=False, return_state=False, 
+# go_backwards=False, stateful=False, unroll=False)
+# units: 正整数，输出空间的维度。
+# activation: 要使用的激活函数。 如果传入 None，则不使用激活函数 (即 线性激活：a(x) = x)。
+# recurrent_activation: 用于循环时间步的激活函数。 默认：分段线性近似 sigmoid (hard_sigmoid)。 如果传入 None，则不使用激活函数 (即 线性激活：a(x) = x)。
+# use_bias: 布尔值，该层是否使用偏置向量。
+# kernel_initializer: kernel 权值矩阵的初始化器，用于输入的线性转换。
+# recurrent_initializer: recurrent_kernel 权值矩阵 的初始化器，用于循环层状态的线性转换。
+# bias_initializer:偏置向量的初始化器.
+# unit_forget_bias: 布尔值。 如果为 True，初始化时，将忘记门的偏置加 1。 将其设置为 True 同时还会强制 bias_initializer="zeros"。 这个建议来自 Jozefowicz 的一篇论文。
+# kernel_regularizer: 运用到 kernel 权值矩阵的正则化函数。
+# recurrent_regularizer: 运用到 recurrent_kernel 权值矩阵的正则化函数。
+# bias_regularizer: 运用到偏置向量的正则化函数。
+# activity_regularizer: 运用到层输出（它的激活值）的正则化函数。
+# kernel_constraint: 运用到 kernel 权值矩阵的约束函数。
+# recurrent_constraint: 运用到 recurrent_kernel 权值矩阵的约束函数。
+# bias_constraint: 运用到偏置向量的约束函数。
+# dropout: 在 0 和 1 之间的浮点数。 单元的丢弃比例，用于输入的线性转换。
+# recurrent_dropout: 在 0 和 1 之间的浮点数。 单元的丢弃比例，用于循环层状态的线性转换。
+# implementation: 实现模式，1 或 2。 模式 1 将把它的操作结构化为更多的小的点积和加法操作， 而模式 2 将把它们分批到更少，更大的操作中。 这些模式在不同的硬件和不同的应用中具有不同的性能配置文件。
+# return_sequences: 布尔值。是返回输出序列中的最后一个输出，还是全部序列。
+# return_state: 布尔值。除了输出之外是否返回最后一个状态。
+# go_backwards: 布尔值 (默认 False)。 如果为 True，则向后处理输入序列并返回相反的序列。
+# stateful: 布尔值 (默认 False)。 如果为 True，则批次中索引 i 处的每个样品的最后状态 将用作下一批次中索引 i 样品的初始状态。
+# unroll: 布尔值 (默认 False)。 如果为 True，则网络将展开，否则将使用符号循环。 展开可以加速 RNN，但它往往会占用更多的内存。 展开只适用于短序列。
 
 from .core import LocalActivationUnit
+# DIN 中使用的LocalActivationUnit，根据不同的候选项，用户兴趣的表示形式会自适应地变化。
 from .normalization import LayerNormalization
+#继承自tensorflow.python.keras.layers 正则化类
 
 if tf.__version__ >= '2.0.0':
     from ..contrib.rnn_v2 import dynamic_rnn
+# 创建由 RNNCell “cell” 指定的循环神经网络。执行“inputs”的完全动态展开。
 else:
     from ..contrib.rnn import dynamic_rnn
 from ..contrib.utils import QAAttGRUCell, VecAttGRUCell
+#QAAttGRUCell：Gated门控 Recurrent循环 Unit cell单元
+#VecAttGRUCell：门控循环单元
+
 from .utils import reduce_sum, reduce_max, div, softmax, reduce_mean
 
 
