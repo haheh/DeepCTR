@@ -110,7 +110,13 @@ class VarLenSparseFeat(namedtuple('VarLenSparseFeat',
 
     def __new__(cls, sparsefeat, maxlen, combiner="mean", length_name=None, weight_name=None, weight_norm=True):
         return super(VarLenSparseFeat, cls).__new__(cls, sparsefeat, maxlen, combiner, length_name, weight_name,
-                                                    weight_norm)
+                                                    weight_norm)#super(类，实例)
+    #def super(cls, inst):
+    #   mro = inst.__class__.mro()
+    #   return mro[mro.index(cls) + 1]
+    #cls 代表类，inst 代表实例，上面的代码做了两件事：
+        #获取 inst 的 MRO 列表
+        #查找 cls 在当前 MRO 列表中的 index, 并返回它的下一个类，即 mro[index + 1]
 #因为传入的对象类型是SparseFeat，因此SparseFeat有的属性VarLenSparseFeat都有
     @property
     def name(self):

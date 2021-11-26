@@ -37,6 +37,20 @@ def DIN(dnn_feature_columns, history_feature_list, dnn_use_bn=False,
         dnn_hidden_units=(256, 128, 64), dnn_activation='relu', att_hidden_size=(80, 40), att_activation="dice",
         att_weight_normalization=False, l2_reg_dnn=0, l2_reg_embedding=1e-6, dnn_dropout=0, seed=1024,
         task='binary'):
+    """
+    :dnn_feature_columns: 特征列， 包含数据所有特征的列表
+    :history_feature_list: 用户历史行为列， 反应用户历史行为的特征的列表
+    :dnn_use_bn: 是否使用BatchNormalization
+    :dnn_hidden_units: 全连接层网络的层数和每一层神经元的个数， 一个列表或者元组
+    :dnn_activation_relu: 全连接网络的激活单元类型
+    :att_hidden_size: 注意力层的全连接网络的层数和每一层神经元的个数
+    :att_activation: 注意力层的激活单元类型
+    :att_weight_normalization: 是否归一化注意力得分
+    :l2_reg_dnn: 全连接网络的正则化系数
+    :l2_reg_embedding: embedding向量的正则化稀疏
+    :dnn_dropout: 全连接网络的神经元的失活概率
+    :task: 任务， 可以是分类， 也可是是回归
+    """
     """Instantiates the Deep Interest Network architecture.
 
     :param dnn_feature_columns: 输入到DNN的特征列，一般会包括SparseFeat，VarLenSparseFeat和DenseFeat.

@@ -81,7 +81,13 @@ def get_inputs_list(inputs):
     最后返回一个list
     '''
     return list(chain(*list(map(lambda x: x.values(), filter(lambda x: x is not None, inputs)))))
-
+# >>> foo = [2, 18, 9, 22, 17, 24, 8, 12, 27]
+# >>>
+# >>> print filter(lambda x: x % 3 == 0, foo)
+# [18, 9, 24, 12, 27]
+# >>>
+# >>> print map(lambda x: x * 2 + 10, foo)
+# [14, 46, 28, 54, 44, 58, 26, 34, 64]
 
 def create_embedding_dict(sparse_feature_columns, varlen_sparse_feature_columns, seed, l2_reg,
                           prefix='sparse_', seq_mask_zero=True):

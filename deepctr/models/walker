@@ -1,0 +1,87 @@
+import random
+import numpy as np
+
+class alias_method():
+    def __init__(self,prob) -> None:
+        self.n=len(prob)
+        self.alias_table=np.array(prob)*self.n
+        self.another_id_list=[0]*self.n
+        self.alias=[0]*self.n
+        self.less1=[]
+        self.more1=[]
+        for i,probi in enumerate(self.alias_table):
+            if probi<1.0:
+                self.less1.append(i)
+            else:
+                self.more1.append(i)
+
+        while self.less1 and self.more1:
+            less1_id,more1_id=self.less1.pop(),self.more1.pop()
+            self.alias[less1_id]=self.alias_table[less1_id]
+            self.another_id_list[less1_id]=more1_id
+            self.alias_table[more1_id]=self.alias_table[more1_id]-(1-self.alias_table[less1_id])
+            if self.alias_table[more1_id]<1.0:
+                self.less1.append(more1_id)
+            else:
+                self.more1.append(more1_id)
+            
+        while self.more1:
+            more1_id=self.more1.pop()
+            self.alias[more1_id]=1
+        
+        while self.less1:
+            less1_id=self.less1.pop()
+            self.alias[less1_id]=1
+
+    def sample(self):
+        i = random.randint(0,self.n-1)
+        r = random.random()
+        if r<self.alias[i]:
+            return i
+        else:
+            return self.alias[i]
+
+class _walk:
+    def __init__(self, G, start_node, p=1, q=1, use_rejection_sampling=0, walk_lenth=1):
+        """
+        :G: graph
+        :p: Return parameter,controls the likelihood of immediately revisiting a node in the walk.
+        :q: In-out parameter,allows the search to differentiate between “inward” and “outward” nodes
+        :use_rejection_sampling: Whether to use the rejection sampling strategy in node2vec.
+        :walk_lenth: 步长
+        """
+        self.G = G
+        self.start_node=start_node
+        self.p = p
+        self.q = q
+        self.use_rejection_sampling = use_rejection_sampling
+        self.walk_lenth=walk_lenth
+
+    def deepwalk_walk(self):
+        have_walked=[self.start_node]
+        while len(have_walked)<self.walk_lenth:
+            current_node=have_walked[-1]
+            current_node_neighbor=list(self.G.neighbors(current_node))
+            if len(current_node_neighbor)>0: #如果存在邻居节点
+                have_walked.append(random.choice(current_node_neighbor))
+            else:
+                break
+        return have_walked
+
+    def node2vec_walk(self):
+
+        have_walked=[self.start_node]
+        while len(have_walked)<self.walk_lenth:
+            current_node=have_walked[-1]
+            current_node_neighbor=list(self.G.neighbors(current_node))
+            if len(current_node_neighbor)>0: #如果存在邻居节点
+                if len(have_walked)!=1:
+                    previous_node=have_walked[-2]
+                    edge=(previous_node,current_node)
+                    next_node=current_node_neighbor[alias_method.sample()]
+                    have_walked.append(next_node)
+                elif len(have_walked)==1:
+                    have_walked.append(current_node_neighbor[alias_method.sample()])
+            else:
+                break
+        return have_walked
